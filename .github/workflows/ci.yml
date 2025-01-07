@@ -32,7 +32,7 @@ jobs:
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
-        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} gists-test ./run_critical_cases.sh
+        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_critical_cases.sh
 
 
   medium_priority_tests:
@@ -54,4 +54,4 @@ jobs:
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
-        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} gists-test ./run_medium_priority_tests.sh
+        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_medium_priority_tests.sh

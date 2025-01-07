@@ -1,4 +1,4 @@
-from behave import then
+from behave import then, when
 from behave.runner import Context
 
 @then('No private gist should appear on public gists list')
@@ -21,6 +21,6 @@ def check_if_public_gists_listed(context: Context) -> None:
         case_exception_detail = 'Gists not returned.'
         context.api.show_failure_detail(case_exception_detail)
 
-@when('I get the list of {type} gists')
-def get_public_gists(context: Context, type: str) -> None:
-    context.response = context.api.send_req_to_gists_api(f'{type}-gists')
+@when('I get the list of public gists')
+def get_public_gists(context: Context) -> None:
+    context.response, context.request_correlation_id = context.api.send_req_to_gists_api('public-gists')
