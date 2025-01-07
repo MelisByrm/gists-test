@@ -14,7 +14,8 @@ on:
       - main
 
 jobs:
-  build_and_run:
+  critical_tests:
+    if: github.event_name == 'schedule' && github.event.schedule.cron == '0 */3 * * 1-5' || github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -24,13 +25,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "~3.11"
+          python-version: "~3.12"
 
       - name: Build Docker
         run: docker build -t gists-test .
 
       - name: Run Critical Tests
-        if: github.event.schedule.cron == '0 */3 * * 1-5'
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
@@ -39,8 +39,23 @@ jobs:
             -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
             gists-test ./run_critical_tests.sh
 
+  medium_priority_tests:
+    if: github.event_name == 'schedule' && github.event.schedule.cron == '0 */6 * * 1-5'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "~3.12"
+
+      - name: Build Docker
+        run: docker build -t gists-test .
+
       - name: Run Medium Priority Tests
-        if: github.event.schedule.cron == '0 */6 * * 1-5'
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
