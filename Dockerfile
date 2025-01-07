@@ -11,6 +11,9 @@ RUN apt-get update && \
     ln -s /opt/allure/bin/allure /usr/bin/allure && \
     rm -rf allure.zip /var/lib/apt/lists/*
 
+RUN update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java && \
+    echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> /etc/environment
+
 ENV JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
