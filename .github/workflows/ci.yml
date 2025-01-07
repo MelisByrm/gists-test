@@ -34,6 +34,11 @@ jobs:
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
         run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_critical_cases.sh
 
+      - name: Upload Critical Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: critical-report
+          path: critical_report.html
 
   medium_priority_tests:
     runs-on: ubuntu-latest
@@ -55,3 +60,9 @@ jobs:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
         run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_medium_priority_tests.sh
+
+      - name: Upload Medium Priority Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: medium-report
+          path: medium_report.html
