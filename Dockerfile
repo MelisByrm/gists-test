@@ -4,15 +4,15 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install allure-behave
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends unzip curl && \
     curl -sLo allure.zip https://github.com/allure-framework/allure2/releases/latest/download/allure-2.22.5.zip && \
     unzip allure.zip -d /tmp/ && mv /tmp/allure-2.22.5 /opt/allure && \
     ln -s /opt/allure/bin/allure /usr/bin/allure && \
-    rm -rf allure.zip /var/lib/apt/lists/* \
+    rm -rf allure.zip /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install allure-behave
 
 RUN chmod +x ./run_critical_cases.sh ./run_medium_priority_tests.sh
 
