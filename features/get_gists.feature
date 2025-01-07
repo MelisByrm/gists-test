@@ -1,4 +1,4 @@
-Feature: Critical test scenarios of getting different type of gists
+Feature: Critical test scenarios of getting gists
 
 @priority:High
   Scenario: Get a public gist of another user, ensure gist is successfully fetched
