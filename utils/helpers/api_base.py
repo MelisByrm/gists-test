@@ -83,7 +83,7 @@ class APIBase:
 
 
 
-    def send_req_to_gists_api(self, api: str) -> Response:
+    def send_req_to_gists_api(self, api: str) -> tuple[Response, str]:
         self.request_correlation_id = str(uuid.uuid4())
         headers = {**default_headers}
         if self.access_token:
@@ -96,7 +96,7 @@ class APIBase:
             if response.status_code == 500:
                 raise requests.exceptions.HTTPError(f'Server error 500 returned from: {api}\n'
                                                     f'Request id for log/debug : {self.request_correlation_id}')
-            return response
+            return response, self.request_correlation_id
         except Timeout:
             raise TimeoutError(f'Response took more than 60s from: {api}\n'
                                 f'Request id for log/debug : {self.request_correlation_id}')

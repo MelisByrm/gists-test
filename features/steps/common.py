@@ -50,8 +50,3 @@ def get_created_gist(context: Context) -> None:
     if 'negative' not in context.scenario.tags:
         context.execute_steps('then Response status should be 200')
 
-
-@when('I get the list of public gists')
-def get_public_gists(context: Context) -> None:
-    context.response = context.api.send_req_to_gists_api('public-gists')
-
