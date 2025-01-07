@@ -15,7 +15,6 @@ on:
 
 jobs:
   critical_tests:
-    if: github.event_name == 'schedule' && github.event.schedule.cron == '0 */3 * * 1-5' || github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +39,6 @@ jobs:
             gists-test ./run_critical_tests.sh
 
   medium_priority_tests:
-    if: github.event_name == 'schedule' && github.event.schedule.cron == '0 */6 * * 1-5'
     runs-on: ubuntu-latest
 
     steps:
