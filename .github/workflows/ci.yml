@@ -52,9 +52,8 @@ jobs:
       - name: Generate Allure Report
         run: allure generate allure-results --clean -o allure-report-${{ matrix.test_type }}
 
-      - name: Deploy Allure Report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.TOKEN_GITHUB }}
-          publish_dir: ${{ matrix.test_type == 'critical' && 'allure-report-critical' || 'allure-report-medium' }}
-          destination_dir: ${{ matrix.test_type }}
+          name: allure-report-${{ matrix.test_type }}
+          path: allure-report-${{ matrix.test_type }}
