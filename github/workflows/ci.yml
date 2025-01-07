@@ -1,0 +1,50 @@
+name: Run Gists Tests
+
+on:
+
+  schedule:
+    - cron: "0 */3 * * 1-5"
+    - cron: "0 */6 * * 1-5"
+
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "~3.11"
+
+      - name: Build Docker
+        run: docker build -t gists-test .
+
+      - name: Run Critical Tests
+        if: github.event.schedule.cron == '0 */3 * * 1-5'
+        env:
+          VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
+          INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
+        run: docker run \
+            -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
+            -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
+            gists-test ./run_critical_tests.sh
+
+      - name: Run Medium Priority Tests
+        if: github.event.schedule.cron == '0 */6 * * 1-5'
+        env:
+          VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
+          INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
+        run: docker run \
+            -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
+            -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
+            gists-test ./run_medium_priority_tests.sh
