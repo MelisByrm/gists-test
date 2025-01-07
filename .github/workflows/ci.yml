@@ -30,13 +30,6 @@ jobs:
       - name: Build Docker
         run: docker build -t gists-test .
 
-      - name: Install Allure CLI
-        run: |
-          sudo apt-get update && sudo apt-get install -y curl unzip && \
-          curl -sLo allure.zip https://github.com/allure-framework/allure2/releases/latest/download/allure-2.22.5.zip && \
-          unzip allure.zip -d /tmp/ && sudo mv /tmp/allure-2.22.5 /opt/allure && \
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-
       - name: Run Tests
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
