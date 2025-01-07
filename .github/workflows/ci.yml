@@ -30,6 +30,13 @@ jobs:
       - name: Build Docker
         run: docker build -t gists-test .
 
+      - name: Install Allure CLI
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl unzip && \
+          curl -sLo allure.zip https://github.com/allure-framework/allure2/releases/latest/download/allure-2.22.5.zip && \
+          unzip allure.zip -d /tmp/ && sudo mv /tmp/allure-2.22.5 /opt/allure && \
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
       - name: Run Tests
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
@@ -37,22 +44,13 @@ jobs:
           WITHOUT_PERMISSION_GIST_TOKEN: ${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }}
         run: |
           if [ "${{ matrix.test_type }}" == "critical" ]; then
-            docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
-              -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
-              gists-test ./run_critical_cases.sh
+            ./run_critical_cases.sh
           else
-            docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
-              -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
-              gists-test ./run_medium_priority_tests.sh
+            ./run_medium_priority_tests.sh
           fi
 
       - name: Generate Allure Report
-        run: |
-          if [ "${{ matrix.test_type }}" == "critical" ]; then
-            docker run gists-test allure generate allure-results --clean -o allure-report-critical
-          else
-            docker run gists-test allure generate allure-results --clean -o allure-report-medium
-          fi
+        run: allure generate allure-results --clean -o allure-report-${{ matrix.test_type }}
 
       - name: Deploy Allure Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
