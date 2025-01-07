@@ -13,9 +13,11 @@ on:
       - main
 
 jobs:
-  critical_tests:
+  build_and_test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        test_type: [critical, medium]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,30 +30,33 @@ jobs:
       - name: Build Docker
         run: docker build -t gists-test .
 
-      - name: Run Critical Tests
+      - name: Run Tests
         env:
           VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
           INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
-        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_critical_cases.sh
+          WITHOUT_PERMISSION_GIST_TOKEN: ${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }}
+        run: |
+          if [ "${{ matrix.test_type }}" == "critical" ]; then
+            docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
+              -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
+              gists-test ./run_critical_cases.sh
+          else
+            docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} \
+              -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} \
+              gists-test ./run_medium_priority_tests.sh
+          fi
 
+      - name: Generate Allure Report
+        run: |
+          if [ "${{ matrix.test_type }}" == "critical" ]; then
+            docker run gists-test allure generate allure-results --clean -o allure-report-critical
+          else
+            docker run gists-test allure generate allure-results --clean -o allure-report-medium
+          fi
 
-  medium_priority_tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          python-version: "~3.12"
-
-      - name: Build Docker
-        run: docker build -t gists-test .
-
-      - name: Run Medium Priority Tests
-        env:
-          VALID_GIST_TOKEN: ${{ secrets.VALID_GIST_TOKEN }}
-          INVALID_GIST_TOKEN: ${{ secrets.INVALID_GIST_TOKEN }}
-        run: docker run -e VALID_GIST_TOKEN=${{ secrets.VALID_GIST_TOKEN }} -e INVALID_GIST_TOKEN=${{ secrets.INVALID_GIST_TOKEN }} -e WITHOUT_PERMISSION_GIST_TOKEN=${{ secrets.WITHOUT_PERMISSION_GIST_TOKEN }} gists-test ./run_medium_priority_tests.sh
+          github_token: ${{ secrets.TOKEN_GITHUB }}
+          publish_dir: ${{ matrix.test_type == 'critical' && 'allure-report-critical' || 'allure-report-medium' }}
+          destination_dir: ${{ matrix.test_type }}

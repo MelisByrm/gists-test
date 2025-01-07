@@ -2,4 +2,4 @@ requests
 playwright
 python-dotenv
 behave
-flake8
+allure-behave
