@@ -19,7 +19,7 @@ Feature: Critical test scenarios of creating different type of gists
     When I retrieve the gist
     Then Created gist details should match the original input
 
-  @
+  @priority-High
   Scenario: Create a gist with multiple files and check if it successfully created
     Given I have valid Github API Gist token
     When I create a private gist containing txt,md,html,css type files with MultipleFiles as description
