@@ -19,6 +19,16 @@ Feature: Critical test scenarios of creating different type of gists
     When I retrieve the gist
     Then Created gist details should match the original input
 
+  @
+  Scenario: Create a gist with multiple files and check if it successfully created
+    Given I have valid Github API Gist token
+    When I create a private gist containing txt,md,html,css type files with MultipleFiles as description
+    Then Response status should be 201
+    And Gist data should be in the response
+    When I retrieve the gist
+    Then Created gist details should match the original input
+
+
   @priority-High @negative
   Scenario: Try to create a gist without authentication token and ensure 401 returned
     Given I have no Github API Gist token
